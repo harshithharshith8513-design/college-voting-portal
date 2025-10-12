@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Discover College Voting{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card animate__animated animate__fadeInUp">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
+                    <h2 class="card-title text-dark">Create Account</h2>
+                    <p class="text-muted">Register with your College ID to vote</p>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="roll_number" class="form-label text-dark">
+                                <i class="fas fa-id-badge me-1"></i>Roll Number <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" name="roll_number" id="roll_number" 
+                                   placeholder="e.g., CS21B001" required pattern="^[A-Za-z0-9]+$"
+                                   title="Roll number must contain both letters and numbers">
+                            <div class="form-text text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Must contain both letters and numbers
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label text-dark">
+                                <i class="fas fa-user me-1"></i>Full Name
+                            </label>
+                            <input type="text" class="form-control" name="username" id="username" 
+                                   placeholder="Your full name" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label text-dark">
+                            <i class="fas fa-envelope me-1"></i>College Email
+                        </label>
+                        <input type="email" class="form-control" name="email" id="email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label text-dark">
+                            <i class="fas fa-lock me-1"></i>Password
+                        </label>
+                        <input type="password" class="form-control" name="password" id="password" 
+                               minlength="6" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="student_id" class="form-label text-dark">
+                            <i class="fas fa-id-card me-1"></i>College ID <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" name="student_id" id="student_id" 
+                               placeholder="Enter your valid College ID" required>
+                        <div class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Only admin-approved College IDs can register
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="department" class="form-label text-dark">
+                                <i class="fas fa-building me-1"></i>Department
+                            </label>
+                            <select class="form-control" name="department" id="department" required>
+                                <option value="">Select Department</option>
+                                <option value="Bachelor of Computer Applications">Bachelor of Computer Applications</option>
+                                <option value="BSc Data Science">BSc Data Science</option>
+                                <option value="BCom">BCom</option>
+                                <option value="BSW">BSW</option>
+                                <option value="BBA">BBA</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="year" class="form-label text-dark">
+                                <i class="fas fa-calendar me-1"></i>Year/Semester
+                            </label>
+                            <select class="form-control" name="year" id="year" required>
+                                <option value="">Select Year/Semester</option>
+                                <option value="Semester 1">Semester 1</option>
+                                <option value="Semester 2">Semester 2</option>
+                                <option value="Semester 3">Semester 3</option>
+                                <option value="Semester 4">Semester 4</option>
+                                <option value="Semester 5">Semester 5</option>
+                                <option value="Semester 6">Semester 6</option>
+                                <option value="Graduate">Graduate</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label text-dark">
+                            <i class="fas fa-phone me-1"></i>Phone Number (Optional)
+                        </label>
+                        <input type="tel" class="form-control" name="phone" id="phone" 
+                               placeholder="+91-xxxxxxxxxx">
+                    </div>
+
+                    <div class="d-grid gap-2 mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg pulse">
+                            <i class="fas fa-user-plus me-2"></i>Register Account
+                        </button>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="mb-0 text-dark">Already have an account? 
+                            <a href="{% url 'login' %}" class="text-primary">Login here</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 10px 30px rgba(125, 23, 220, 0.1);
+        background: #ffffff !important;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .card-title {
+        color: #212529 !important;
+    }
+    
+    label {
+        color: #212529 !important;
+        font-weight: 600;
+    }
+    
+    .text-dark {
+        color: #212529 !important;
+    }
+    
+    .text-muted {
+        color: #6c757d !important;
+    }
+    
+    .form-control {
+        background: #f8f9fa !important;
+        border: 1px solid #ced4da !important;
+        color: #212529 !important;
+        padding: 12px 15px;
+        border-radius: 8px;
+    }
+    
+    .form-control:focus {
+        background: #ffffff !important;
+        border-color: #0d6efd !important;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+        color: #212529 !important;
+    }
+    
+    .form-control option {
+        background: #ffffff !important;
+        color: #212529 !important;
+    }
+    
+    select.form-control {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23212529' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.75rem center;
+        background-repeat: no-repeat;
+        background-size: 16px 12px;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(90deg, #576ae6, #5dd6f2);
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 18px;
+        padding: 14px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(90deg, #475edb, #0fc2e0);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(87, 106, 230, 0.4);
+    }
+    
+    .text-primary {
+        color: #0d6efd !important;
+    }
+    
+    .text-danger {
+        color: #dc3545 !important;
+    }
+    
+    .form-text {
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+    
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(87, 106, 230, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(87, 106, 230, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(87, 106, 230, 0); }
+    }
+    
+    /* Roll number validation styling */
+    input[name="roll_number"]:invalid {
+        border-color: #dc3545 !important;
+    }
+    
+    input[name="roll_number"]:valid {
+        border-color: #28a745 !important;
+    }
+</style>
+
+<script>
+// Real-time roll number validation
+document.getElementById('roll_number').addEventListener('input', function(e) {
+    const rollNumber = e.target.value;
+    const hasLetter = /[A-Za-z]/.test(rollNumber);
+    const hasDigit = /[0-9]/.test(rollNumber);
+    const isAlphanumeric = /^[A-Za-z0-9]*$/.test(rollNumber);
+    
+    // Remove any existing feedback
+    const existingFeedback = e.target.parentNode.querySelector('.validation-feedback');
+    if (existingFeedback) {
+        existingFeedback.remove();
+    }
+    
+    // Create feedback element
+    const feedback = document.createElement('div');
+    feedback.className = 'validation-feedback form-text';
+    feedback.style.marginTop = '5px';
+    
+    if (rollNumber.length === 0) {
+        return;
+    } else if (!isAlphanumeric) {
+        feedback.innerHTML = '<span style="color: #dc3545;"><i class="fas fa-times me-1"></i>Only letters and numbers allowed</span>';
+        e.target.style.borderColor = '#dc3545';
+    } else if (!hasLetter || !hasDigit) {
+        feedback.innerHTML = '<span style="color: #ffc107;"><i class="fas fa-exclamation-triangle me-1"></i>Must contain both letters and numbers</span>';
+        e.target.style.borderColor = '#ffc107';
+    } else {
+        feedback.innerHTML = '<span style="color: #28a745;"><i class="fas fa-check me-1"></i>Valid roll number format</span>';
+        e.target.style.borderColor = '#28a745';
+    }
+    
+    e.target.parentNode.appendChild(feedback);
+});
+</script>
+{% endblock %}

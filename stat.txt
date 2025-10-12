@@ -1,0 +1,37 @@
+# Quick Setup Commands for Discover College Voting System
+
+# 1. Create and activate virtual environment
+python -m venv venv
+venv\Scripts\activate
+
+# 2. Install required packages
+pip install -r requirements.txt
+
+# 3. Create database migrations
+python manage.py makemigrations users
+python manage.py makemigrations elections
+
+# 4. Apply migrations
+python manage.py migrate
+
+# 5. Create superuser (admin account)
+python manage.py createsuperuser
+# Suggested credentials for testing:
+
+#Username: admin123
+# Email: admin123@college.com
+# Password: discover01
+
+# 6. Run development server
+python manage.py runserver
+
+# 7. Access the application
+# Main Site: http://127.0.0.1:8000/
+# Admin Dashboard: http://127.0.0.1:8000/admin-dashboard/
+# College ID Management: http://127.0.0.1:8000/admin-college-ids/
+# Django Admin: http://127.0.0.1:8000/admin/
+
+# IMPORTANT: Add College IDs through admin panel before students can register!
+
+# Optional: Load sample data (if fixtures are created)
+# python manage.py loaddata sample_college_ids.json

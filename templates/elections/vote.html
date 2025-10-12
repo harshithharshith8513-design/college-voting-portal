@@ -1,0 +1,403 @@
+{% extends 'base.html' %}
+
+{% block title %}Vote for {{ position.name }}{% endblock %}
+
+{% block content %}
+<div class="animate__animated animate__fadeIn">
+    <!-- Voting Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient text-white voting-header-card">
+                <div class="card-body p-4 text-center">
+                    <h1 class="display-6 mb-2 text-white">
+                        <i class="fas fa-vote-yea me-3"></i>
+                        Cast Your Vote
+                    </h1>
+                    <p class="lead mb-0 text-white">{{ position.election.title }} - {{ position.name }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voting Instructions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info voting-instructions">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Instructions:</strong> Select one candidate from the list below and click "Submit Vote" to cast your ballot. 
+                <strong class="text-danger">Your vote is final and cannot be changed once submitted.</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Candidates List -->
+    <form method="post" id="votingForm">
+        {% csrf_token %}
+        <div class="row">
+            {% for candidate in candidates %}
+                <div class="col-lg-6 col-xl-4 mb-4">
+                    <div class="candidate-card">
+                        <input type="radio" id="candidate{{ candidate.id }}" 
+                               name="candidate" value="{{ candidate.id }}" required>
+                        <label for="candidate{{ candidate.id }}" class="candidate-label">
+                            <div class="card h-100 animate__animated animate__fadeInUp" 
+                                 style="animation-delay: {{ forloop.counter0|floatformat:0|add:'0.1' }}s">
+                                {% if candidate.photo %}
+                                    <img src="{{ candidate.photo.url }}" class="card-img-top candidate-photo" 
+                                         alt="{{ candidate.name }}">
+                                {% else %}
+                                    <div class="card-img-top candidate-photo-placeholder">
+                                        <i class="fas fa-user fa-4x text-muted"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="card-body text-center">
+                                    <h5 class="card-title text-white">{{ candidate.name }}</h5>
+                                    <p class="text-light mb-2">
+                                        <i class="fas fa-id-badge me-1"></i>
+                                        ID: {{ candidate.student_id }}
+                                    </p>
+                                    
+                                    {% if candidate.manifesto %}
+                                        <div class="manifesto-preview">
+                                            <h6 class="text-primary">
+                                                <i class="fas fa-scroll me-1"></i>Manifesto:
+                                            </h6>
+                                            <p class="small text-light">
+                                                {{ candidate.manifesto|truncatewords:30 }}
+                                            </p>
+                                            {% if candidate.manifesto|length > 200 %}
+                                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                        onclick="toggleManifesto({{ candidate.id }})">
+                                                    Read More
+                                                </button>
+                                                <div id="fullManifesto{{ candidate.id }}" class="full-manifesto" style="display: none;">
+                                                    <p class="small text-light mt-2">{{ candidate.manifesto }}</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="card-footer bg-transparent text-center">
+                                    <div class="selection-indicator">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span class="text-white">Selected</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="card no-candidates-card">
+                        <div class="card-body text-center p-5">
+                            <i class="fas fa-users-slash fa-4x text-muted mb-4"></i>
+                            <h3 class="text-white mb-3">No Candidates Available</h3>
+                            <p class="text-light">
+                                No candidates are registered for this position yet.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if candidates %}
+            <!-- Submit Vote Button -->
+            <div class="row mt-5">
+                <div class="col-12 text-center">
+                    <div class="vote-submit-section">
+                        <div class="mb-3">
+                            <h4 class="text-white">Ready to Submit Your Vote?</h4>
+                            <p class="text-light">Please double-check your selection before submitting.</p>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success btn-lg pulse" id="submitVoteBtn">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            Submit My Vote
+                        </button>
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'election_detail' position.election.id %}" 
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Back to Election
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </form>
+</div>
+
+<style>
+    /* Voting Header Card */
+    .voting-header-card {
+        background: linear-gradient(135deg, #576ae6, #5dd6f2) !important;
+        border: none !important;
+        box-shadow: 0 15px 35px rgba(87, 106, 230, 0.4) !important;
+    }
+    
+    /* Instructions Alert */
+    .voting-instructions {
+        background: rgba(23, 162, 184, 0.2) !important;
+        border: 1px solid rgba(23, 162, 184, 0.4) !important;
+        color: #ffffff !important;
+        border-radius: 10px;
+    }
+    
+    /* Candidate Cards */
+    .candidate-card {
+        position: relative;
+    }
+    
+    .candidate-card input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        z-index: -1;
+    }
+    
+    .candidate-label {
+        cursor: pointer;
+        display: block;
+        margin: 0;
+    }
+    
+    .candidate-label .card {
+        background: rgba(30, 32, 64, 0.9) !important;
+        border: 2px solid rgba(255,255,255,0.2) !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
+        transition: all 0.3s ease;
+    }
+    
+    .candidate-label .card:hover {
+        border-color: var(--primary-color) !important;
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(87, 106, 230, 0.3) !important;
+    }
+    
+    .candidate-card input[type="radio"]:checked + .candidate-label .card {
+        border-color: #28a745 !important;
+        background: rgba(40, 167, 69, 0.1) !important;
+        transform: scale(1.02);
+        box-shadow: 0 15px 35px rgba(40, 167, 69, 0.4) !important;
+    }
+    
+    /* Candidate Photo */
+    .candidate-photo {
+        height: 200px;
+        object-fit: cover;
+        object-position: center;
+        border-radius: 10px 10px 0 0;
+    }
+    
+    .candidate-photo-placeholder {
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(108, 117, 125, 0.3);
+        border-radius: 10px 10px 0 0;
+    }
+    
+    /* Manifesto Section */
+    .manifesto-preview {
+        max-height: 120px;
+        overflow: hidden;
+        margin-top: 1rem;
+    }
+    
+    .full-manifesto {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    
+    /* Selection Indicator */
+    .selection-indicator {
+        display: none;
+        color: #28a745;
+        font-weight: bold;
+        padding: 10px;
+    }
+    
+    .candidate-card input[type="radio"]:checked + .candidate-label .selection-indicator {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    /* Vote Submit Section */
+    .vote-submit-section {
+        background: rgba(30, 32, 64, 0.9) !important;
+        padding: 2rem;
+        border-radius: 15px;
+        border: 1.5px solid rgba(255,255,255,0.2);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    
+    /* No Candidates Card */
+    .no-candidates-card {
+        background: rgba(30, 32, 64, 0.8) !important;
+        border: 1.5px solid rgba(255,255,255,0.2) !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
+    }
+    
+    /* Text Colors */
+    .text-white {
+        color: #ffffff !important;
+    }
+    
+    .text-light {
+        color: #e9ecef !important;
+    }
+    
+    .text-primary {
+        color: #5dd6f2 !important;
+    }
+    
+    .text-muted {
+        color: #6c757d !important;
+    }
+    
+    .text-danger {
+        color: #ff6b6b !important;
+    }
+    
+    /* Card Components */
+    .card-title {
+        color: #ffffff !important;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    
+    /* Button Styling */
+    .btn-success {
+        background: linear-gradient(90deg, #28a745, #20c997) !important;
+        border: none !important;
+        color: white !important;
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-success:hover {
+        background: linear-gradient(90deg, #218838, #1aa085) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4) !important;
+    }
+    
+    .btn-outline-secondary {
+        border: 2px solid #6c757d !important;
+        color: #6c757d !important;
+        background: transparent !important;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        padding: 12px 24px;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #6c757d !important;
+        color: white !important;
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-primary {
+        border: 1px solid #5dd6f2 !important;
+        color: #5dd6f2 !important;
+        background: transparent !important;
+        font-size: 0.875rem;
+    }
+    
+    .btn-outline-primary:hover {
+        background: #5dd6f2 !important;
+        color: white !important;
+    }
+    
+    /* Animation */
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .display-6 {
+            font-size: 1.5rem;
+        }
+        
+        .candidate-card {
+            margin-bottom: 1.5rem;
+        }
+        
+        .vote-submit-section {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<script>
+// Toggle manifesto function
+function toggleManifesto(candidateId) {
+    const manifesto = document.getElementById(`fullManifesto${candidateId}`);
+    const button = event.target;
+    
+    if (manifesto.style.display === 'none' || manifesto.style.display === '') {
+        manifesto.style.display = 'block';
+        button.textContent = 'Read Less';
+    } else {
+        manifesto.style.display = 'none';
+        button.textContent = 'Read More';
+    }
+}
+
+// Form submission handling
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('votingForm');
+    const submitBtn = document.getElementById('submitVoteBtn');
+    
+    form.addEventListener('submit', function(e) {
+        const selectedCandidate = document.querySelector('input[name="candidate"]:checked');
+        
+        if (!selectedCandidate) {
+            e.preventDefault();
+            alert('Please select a candidate before submitting your vote.');
+            return;
+        }
+        
+        // Get candidate name
+        const candidateName = selectedCandidate.closest('.card').querySelector('.card-title').textContent;
+        const confirmVote = confirm(`Are you sure you want to vote for ${candidateName}? This action cannot be undone.`);
+        
+        if (!confirmVote) {
+            e.preventDefault();
+            return;
+        }
+        
+        // Disable button and show loading state
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting Vote...';
+        submitBtn.disabled = true;
+        
+        // Re-enable after timeout (in case of error)
+        setTimeout(() => {
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit My Vote';
+            submitBtn.disabled = false;
+        }, 10000);
+    });
+});
+</script>
+{% endblock %}

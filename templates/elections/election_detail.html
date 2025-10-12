@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ election.title }} - Voting{% endblock %}
+
+{% block content %}
+<div class="animate__animated animate__fadeIn">
+    <!-- Election Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white election-header-card">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <h1 class="display-5 mb-2 text-white">
+                                <i class="fas fa-poll-h me-3"></i>
+                                {{ election.title }}
+                            </h1>
+                            <p class="lead mb-0 text-white">{{ election.description }}</p>
+                        </div>
+                        <div class="col-lg-4 text-end">
+                            <div class="badge bg-success fs-6 p-2">
+                                <i class="fas fa-circle me-1"></i>Active Election
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Election Timeline -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card timeline-card">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <i class="fas fa-play-circle text-success fa-2x me-3"></i>
+                                <div>
+                                    <h6 class="mb-0 text-white">Election Started</h6>
+                                    <small class="text-light">
+                                        {{ election.start_date|date:"M d, Y H:i" }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center justify-content-center mb-2">
+                                <i class="fas fa-stop-circle text-danger fa-2x me-3"></i>
+                                <div>
+                                    <h6 class="mb-0 text-white">Election Ends</h6>
+                                    <small class="text-light">
+                                        {{ election.end_date|date:"M d, Y H:i" }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Positions to Vote -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h2 class="mb-4 text-white">
+                <i class="fas fa-users me-2 text-primary"></i>
+                Positions Available for Voting
+            </h2>
+        </div>
+    </div>
+
+    {% if positions %}
+        <div class="row">
+            {% for position in positions %}
+                <div class="col-lg-6 col-xl-4 mb-4">
+                    <div class="card h-100 animate__animated animate__fadeInUp position-card" 
+                         style="animation-delay: {{ forloop.counter0|floatformat:0|add:'0.1' }}s">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 text-white">
+                                <i class="fas fa-user-tie me-2"></i>
+                                {{ position.name }}
+                            </h5>
+                            {% if position.id in voted_positions %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i>Voted
+                                </span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-clock me-1"></i>Pending
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-body text-center">
+                            {% if position.id in voted_positions %}
+                                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                                <h6 class="text-success mb-3">Vote Submitted Successfully!</h6>
+                                <p class="text-light">You have already cast your vote for this position.</p>
+                            {% else %}
+                                <i class="fas fa-vote-yea fa-3x text-primary mb-3"></i>
+                                <h6 class="text-primary mb-3">Ready to Vote</h6>
+                                <p class="text-light mb-4">Cast your vote for {{ position.name }}</p>
+                                
+                                <a href="{% url 'vote_position' position.id %}" 
+                                   class="btn btn-primary pulse">
+                                    <i class="fas fa-arrow-right me-2"></i>
+                                    Vote Now
+                                </a>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-footer bg-transparent text-center">
+                            <small class="text-light">
+                                <i class="fas fa-users me-1"></i>
+                                Max {{ position.max_candidates }} candidates
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card no-positions-card">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-exclamation-triangle fa-4x text-warning mb-4"></i>
+                        <h3 class="text-white mb-3">No Positions Available</h3>
+                        <p class="text-light">
+                            No positions are available for voting in this election yet.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Back to Dashboard -->
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Election Header Card */
+    .election-header-card {
+        background: linear-gradient(135deg, #576ae6, #5dd6f2) !important;
+        border: none !important;
+        box-shadow: 0 15px 35px rgba(87, 106, 230, 0.4) !important;
+    }
+    
+    /* Timeline Card */
+    .timeline-card {
+        background: rgba(30, 32, 64, 0.9) !important;
+        border: 1.5px solid rgba(255,255,255,0.2) !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
+    }
+    
+    /* Position Cards */
+    .position-card {
+        background: rgba(30, 32, 64, 0.9) !important;
+        border: 1.5px solid rgba(255,255,255,0.2) !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
+        transition: all 0.3s ease;
+    }
+    
+    .position-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(87, 106, 230, 0.4) !important;
+    }
+    
+    .position-card .card-header {
+        background: rgba(87, 106, 230, 0.2) !important;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    /* No Positions Card */
+    .no-positions-card {
+        background: rgba(30, 32, 64, 0.8) !important;
+        border: 1.5px solid rgba(255,255,255,0.2) !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
+    }
+    
+    /* Text Colors */
+    .text-white {
+        color: #ffffff !important;
+    }
+    
+    .text-light {
+        color: #e9ecef !important;
+    }
+    
+    .text-primary {
+        color: #5dd6f2 !important;
+    }
+    
+    .text-success {
+        color: #28a745 !important;
+    }
+    
+    .text-warning {
+        color: #ffc107 !important;
+    }
+    
+    /* Badge Styling */
+    .badge.bg-success {
+        background: #28a745 !important;
+        color: white !important;
+    }
+    
+    .badge.bg-warning {
+        background: #ffc107 !important;
+        color: #000 !important;
+    }
+    
+    /* Button Styling */
+    .btn-primary {
+        background: linear-gradient(90deg, #576ae6, #5dd6f2) !important;
+        border: none !important;
+        color: white !important;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        padding: 12px 24px;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(90deg, #475edb, #0fc2e0) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(87, 106, 230, 0.4) !important;
+    }
+    
+    .btn-outline-primary {
+        border: 2px solid #5dd6f2 !important;
+        color: #5dd6f2 !important;
+        background: transparent !important;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        padding: 12px 24px;
+    }
+    
+    .btn-outline-primary:hover {
+        background: #5dd6f2 !important;
+        color: white !important;
+        transform: translateY(-2px);
+    }
+    
+    /* Card Components */
+    .card-title {
+        color: #ffffff !important;
+        font-weight: 600;
+    }
+    
+    .card-text {
+        color: #e9ecef !important;
+        line-height: 1.6;
+    }
+    
+    /* Animation */
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(87, 106, 230, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(87, 106, 230, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(87, 106, 230, 0); }
+    }
+    
+    /* Icons with gradient effect */
+    .fa-vote-yea {
+        background: linear-gradient(45deg, #5dd6f2, #576ae6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .display-5 {
+            font-size: 1.75rem;
+        }
+        
+        .position-card {
+            margin-bottom: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}

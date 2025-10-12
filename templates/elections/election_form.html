@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container" style="min-height: 90vh; display: flex; align-items: center; justify-content: center;">
+    <div class="form-card shadow-lg p-5 bg-white rounded" style="width: 100%; max-width: 430px;">
+        <h3 class="text-center mb-4 text-dark">{{ title }}</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                {{ form.title.label_tag }} 
+                {{ form.title }}
+            </div>
+            <div class="mb-3">
+                {{ form.description.label_tag }} 
+                {{ form.description }}
+            </div>
+            <div class="mb-3">
+                {{ form.start_date.label_tag }}
+                <input type="datetime-local" name="start_date" id="id_start_date" class="form-control" value="{{ form.start_date.value|default_if_none:'' }}">
+            </div>
+            <div class="mb-3">
+                {{ form.end_date.label_tag }}
+                <input type="datetime-local" name="end_date" id="id_end_date" class="form-control" value="{{ form.end_date.value|default_if_none:'' }}">
+            </div>
+            <div class="mb-3">
+                {{ form.status.label_tag }} 
+                {{ form.status }}
+            </div>
+            <button type="submit" class="btn btn-primary w-100">{{ title }}</button>
+            <a href="{% url 'election_management' %}" class="btn btn-secondary mt-2 w-100">Cancel</a>
+        </form>
+    </div>
+</div>
+<style>
+.form-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.16), 0 1.5px 6px rgba(0,0,0,0.11)!important;
+    transition: box-shadow 0.3s;
+}
+.form-card:hover {
+    box-shadow: 0 16px 48px rgba(0,0,0,0.20), 0 3px 12px rgba(0,0,0,0.13)!important;
+}
+label {
+    font-weight: 500;
+    color: #333;
+}
+input, textarea, select {
+    border-radius: 6px !important;
+    border: 1px solid #ced4da !important;
+    padding: 8px 12px !important;
+    width: 100% !important;
+    background: #f9f9f9;
+    color: #212529;
+    margin-top: 4px;
+}
+input:focus, textarea:focus, select:focus {
+    background: #fff;
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 0.15rem rgba(13,110,253,0.15)!important;
+}
+.btn-primary {
+    background: #0d6efd !important;
+    border-color: #0d6efd !important;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+.btn-primary:hover {
+    background: #054eb7 !important;
+}
+</style>
+{% endblock %}

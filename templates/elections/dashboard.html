@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Discover College Voting{% endblock %}
+
+{% block content %}
+<div>
+    <!-- Welcome Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card welcome-card">
+                <div class="card-body p-5 text-center">
+                    <h1 class="display-4 mb-3 text-dark">
+                        <i class="fas fa-vote-yea me-3"></i>
+                        Welcome to Voting Portal
+                    </h1>
+                    <p class="lead mb-0 text-muted">Your voice matters. Make it count.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Elections Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h2 class="text-dark">
+                    <i class="fas fa-poll-h me-2 text-primary"></i>
+                    Active Elections
+                </h2>
+                {% if user.is_staff %}
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-cog me-1"></i>Admin Panel
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if elections %}
+        <div class="row">
+            {% for election in elections %}
+                <div class="col-lg-6 col-xl-4 mb-4">
+                    <div class="card h-100 election-card">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title mb-0 text-dark">
+                                <i class="fas fa-calendar-check me-2"></i>
+                                {{ election.title }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text text-dark">{{ election.description|truncatewords:20 }}</p>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    <strong>Start:</strong> {{ election.start_date|date:"M d, Y H:i" }}
+                                </small><br>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    <strong>End:</strong> {{ election.end_date|date:"M d, Y H:i" }}
+                                </small>
+                            </div>
+
+                            <div class="mb-3">
+                                <span class="badge bg-success">
+                                    <i class="fas fa-circle me-1"></i>Active
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="{% url 'election_detail' election.id %}" 
+                               class="btn btn-primary w-100">
+                                <i class="fas fa-vote-yea me-2"></i>Vote Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card no-elections-card">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-inbox fa-4x text-muted mb-4"></i>
+                        <h3 class="text-dark mb-3">No Active Elections</h3>
+                        <p class="text-muted mb-4">
+                            There are currently no active elections. 
+                            Please check back later or contact the administrator.
+                        </p>
+                        {% if user.is_staff %}
+                            <a href="{% url 'admin_dashboard' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Create Election
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- User Info Card -->
+    {% if user.userprofile %}
+    <div class="row mt-5">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card user-info-card">
+                <div class="card-header">
+                    <h5 class="mb-0 text-dark">
+                        <i class="fas fa-user me-2"></i>Your Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="text-dark"><strong>Name:</strong> {{ user.userprofile.full_name|default:user.username }}</p>
+                            <p class="text-dark"><strong>College ID:</strong> {{ user.userprofile.student_id }}</p>
+                            <p class="text-dark"><strong>Department:</strong> {{ user.userprofile.department }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="text-dark"><strong>Year:</strong> {{ user.userprofile.year }}</p>
+                            <p class="text-dark"><strong>Email:</strong> {{ user.email }}</p>
+                            <p class="text-dark"><strong>Phone:</strong> {{ user.userprofile.phone|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    /* General body background */
+    body {
+        background-color: #f8f9fa !important;
+    }
+
+    /* Welcome Card Styling */
+    .welcome-card {
+        background: #ffffff !important;
+        border: 2px solid #090909ff !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        border-radius: 10px;
+    }
+    
+    /* Election Cards Styling */
+    .election-card {
+        background: #ffffff !important;
+        border: 1px solid #0f1010ff !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        border-radius: 10px;
+        transition: box-shadow 0.3s ease;
+    }
+    
+    .election-card:hover {
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .election-card .card-header {
+        background: #f8f9fa !important;
+        border-bottom: 1px solid #090909ff;
+    }
+    
+    /* No Elections Card */
+    .no-elections-card {
+        background: #ffffff !important;
+        border: 1px solid #e9ecef !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        border-radius: 10px;
+    }
+    
+    /* User Info Card */
+    .user-info-card {
+        background: #ffffff !important;
+        border: 1px solid #e9ecef !important;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        border-radius: 10px;
+    }
+    
+    .user-info-card .card-header {
+        background: #f8f9fa !important;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    /* Text Colors */
+    .text-dark {
+        color: #212529 !important;
+    }
+    
+    .text-muted {
+        color: #111212ff !important;
+    }
+    
+    .text-primary {
+        color: #0d6efd !important;
+    }
+    
+    /* Badge Styling */
+    .badge.bg-success {
+        background: #198754 !important;
+        color: white !important;
+    }
+    
+    /* Button Styling */
+    .btn-primary {
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        color: white !important;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background-color: #0b5ed7 !important;
+        border-color: #0a58ca !important;
+        transform: translateY(-1px);
+    }
+    
+    .btn-outline-primary {
+        border: 1px solid #0d6efd !important;
+        color: #0d6efd !important;
+        background: transparent !important;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-primary:hover {
+        background: #0d6efd !important;
+        color: white !important;
+        transform: translateY(-1px);
+    }
+    
+    /* Card Title and Text */
+    .card-title {
+        color: #212529 !important;
+        font-weight: 600;
+    }
+    
+    .card-text {
+        color: #212529 !important;
+        line-height: 1.6;
+    }
+    
+    /* Icons */
+    .fa-vote-yea {
+        color: #0d6efd;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .display-4 {
+            font-size: 2rem;
+        }
+        
+        .election-card {
+            margin-bottom: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}

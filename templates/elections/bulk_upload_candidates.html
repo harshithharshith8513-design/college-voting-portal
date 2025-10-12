@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Bulk Upload Candidates - Discover College Voting{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 480px; margin-top: 70px;">
+    <div class="card shadow p-4">
+        <h3 class="mb-3 text-dark">Bulk Upload Candidates (CSV)</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="csv" class="form-label">CSV File</label>
+                <input type="file" name="csv_file" class="form-control" accept=".csv" required>
+                <small class="text-muted">
+                    Required columns: <b>name, student_id, position, manifesto</b>
+                </small>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Upload</button>
+        </form>
+        <div class="mt-3 alert alert-info">
+            <b>Instructions:</b>
+            <ul class="mb-1">
+                <li>Use Excel/Google Sheets to prepare candidates data.</li>
+                <li>Export as <code>.csv</code> with required columns in header.</li>
+                <li><b>position</b> should match the name of an existing position.</li>
+                <li>All rows after header will be imported/updated.</li>
+            </ul>
+        </div>
+        <div>
+            <details>
+                <summary class="text-primary pointer mb-2">See example CSV</summary>
+                <pre class="bg-light p-2 rounded border">
+name,student_id,position,manifesto
+John Doe,STU123,President,Transparency and Trust
+Alice Smith,STU456,Secretary,Student engagement
+                </pre>
+            </details>
+        </div>
+    </div>
+</div>
+{% endblock %}
