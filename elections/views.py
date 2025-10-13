@@ -3,21 +3,28 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.http import HttpResponse
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
+from users.models import UserProfile   # <--- Import your profile model!
 from .models import Election, Position, Candidate, Vote
 
-# --- TEMPORARY: One-time superuser creation view for custom roll_number login ---
+# --- TEMPORARY: One-time superuser creation view ---
 def create_temp_superuser(request):
-    User = get_user_model()
-    # CHANGE "roll_number" to your actual primary login field if different!
-    if not User.objects.filter(roll_number="admin123").exists():
+    if not User.objects.filter(username="admin123").exists():
         user = User.objects.create_superuser(
-            roll_number="admin123",  # <-- this must match your custom field!
+            username="admin123",
             email="admin@example.com",
             password="discover01"
         )
-        user.save()
-        return HttpResponse("Superuser created! Roll Number: admin123, Password: discover01")
+        UserProfile.objects.create(
+            user=user,
+            roll_number="admin123",
+            student_id="ADMIN001",          # just make sure this is unique
+            college_email="admin@example.com",
+            department="Admin",
+            year="Admin",
+            username="Admin"
+        )
+        return HttpResponse("Superuser created! Roll Number (username): admin123, Password: discover01")
     else:
         return HttpResponse("Superuser already exists.")
 
@@ -25,9 +32,7 @@ def create_temp_superuser(request):
 def dashboard(request):
     """Main dashboard showing active elections"""
     active_elections = Election.objects.filter(status='active')
-    return render(request, 'elections/dashboard.html', {
-        'elections': active_elections
-    })
+    return render(request, 'elections/dashboard.html', {'elections': active_elections})
 
 @login_required
 def election_detail(request, election_id):
