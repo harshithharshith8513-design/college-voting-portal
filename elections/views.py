@@ -2,7 +2,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from django.http import HttpResponse
+from django.contrib.auth.models import User
 from .models import Election, Position, Candidate, Vote
+
+# TEMPORARY: One-time superuser creation view for cloud deployment (delete after use)
+def create_temp_superuser(request):
+    if not User.objects.filter(username="admin123").exists():
+        User.objects.create_superuser("admin123", "admin@example.com", "discover01")
+        return HttpResponse("Superuser created! Username: admin123, Password: discover01")
+    else:
+        return HttpResponse("Superuser already exists.")
 
 @login_required
 def dashboard(request):
