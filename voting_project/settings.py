@@ -53,15 +53,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'voting_project.wsgi.application'
 
-# PostgreSQL DATABASE CONFIG FOR Render
-# Old (SQLite)
+# DATABASE CONFIG - Updated for PostgreSQL on Render
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / "db.sqlite3",
-    }
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}'  # fallback for local dev
+    )
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
