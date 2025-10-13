@@ -3,14 +3,21 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.http import HttpResponse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from .models import Election, Position, Candidate, Vote
 
-# TEMPORARY: One-time superuser creation view for cloud deployment (delete after use)
+# --- TEMPORARY: One-time superuser creation view for custom roll_number login ---
 def create_temp_superuser(request):
-    if not User.objects.filter(username="admin123").exists():
-        User.objects.create_superuser("admin123", "admin@example.com", "discover01")
-        return HttpResponse("Superuser created! Username: admin123, Password: discover01")
+    User = get_user_model()
+    # CHANGE "roll_number" to your actual primary login field if different!
+    if not User.objects.filter(roll_number="admin123").exists():
+        user = User.objects.create_superuser(
+            roll_number="admin123",  # <-- this must match your custom field!
+            email="admin@example.com",
+            password="discover01"
+        )
+        user.save()
+        return HttpResponse("Superuser created! Roll Number: admin123, Password: discover01")
     else:
         return HttpResponse("Superuser already exists.")
 
@@ -26,17 +33,14 @@ def dashboard(request):
 def election_detail(request, election_id):
     """Show details of specific election and positions"""
     election = get_object_or_404(Election, id=election_id)
-    
     if not election.is_active():
         messages.error(request, 'This election is not currently active')
         return redirect('dashboard')
-    
     positions = Position.objects.filter(election=election)
     voted_positions = Vote.objects.filter(
         voter=request.user,
         position__election=election
     ).values_list('position_id', flat=True)
-    
     return render(request, 'elections/election_detail.html', {
         'election': election,
         'positions': positions,
@@ -47,19 +51,15 @@ def election_detail(request, election_id):
 def vote_for_position(request, position_id):
     """Handle voting for a specific position"""
     position = get_object_or_404(Position, id=position_id)
-    
     # Check if election is active
     if not position.election.is_active():
         messages.error(request, 'This election is not currently active')
         return redirect('dashboard')
-    
     # Check if user already voted for this position
     if Vote.objects.filter(voter=request.user, position=position).exists():
         messages.error(request, 'You have already voted for this position')
         return redirect('election_detail', election_id=position.election.id)
-    
     candidates = Candidate.objects.filter(position=position)
-    
     if request.method == 'POST':
         candidate_id = request.POST.get('candidate')
         if not candidate_id:
@@ -68,30 +68,24 @@ def vote_for_position(request, position_id):
                 'position': position,
                 'candidates': candidates
             })
-        
         candidate = get_object_or_404(Candidate, id=candidate_id)
-        
         # Create vote record
         Vote.objects.create(
             voter=request.user,
             candidate=candidate,
             position=position
         )
-        
         # Update vote count
         candidate.vote_count += 1
         candidate.save()
-        
         # Update user profile to mark as voted
         try:
             request.user.userprofile.has_voted = True
             request.user.userprofile.save()
         except:
             pass
-        
         messages.success(request, f'Your vote for {position.name} has been recorded!')
         return redirect('election_detail', election_id=position.election.id)
-    
     return render(request, 'elections/vote.html', {
         'position': position,
         'candidates': candidates
