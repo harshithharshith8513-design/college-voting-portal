@@ -14,7 +14,7 @@ SECRET_KEY = 'your_secret_key_here_change_in_production'
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['voting-portal-2.onrender.com']
+ALLOWED_HOSTS = ['college-voting-portal.onrender.com']
 
 
 # Application definition
