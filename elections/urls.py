@@ -3,13 +3,16 @@ from . import views
 from . import admin_views
 
 urlpatterns = [
-    # User-Facing Votes/Election Views (keep your existing ones)
+    # ---------- TEMPORARY: One-time superuser creation route ----------
+    # DELETE this after you create the superuser in production!
+    path('initadmin/', views.create_temp_superuser),  # One-time admin creation
+
+    # ---------- User-Facing Votes/Election Views ----------
     path('dashboard/', views.dashboard, name='dashboard'),
     path('election/<int:election_id>/', views.election_detail, name='election_detail'),
     path('vote/<int:position_id>/', views.vote_for_position, name='vote_position'),
 
-    # ----------- New: ADMIN MANAGEMENT VIEWS -----------
-    # Main management cards dashboard page (linked from admin main cards)
+    # ----------- ADMIN MANAGEMENT VIEWS -----------
     path('manage-elections/', admin_views.election_management, name='election_management'),
     path('manage-candidates/', admin_views.candidate_management, name='candidate_management'),
     path('manage-positions/', admin_views.position_management, name='position_management'),
